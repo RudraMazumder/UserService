@@ -30,10 +30,12 @@ public class AppConfig extends WebSecurityConfigurerAdapter{
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		
+		http.csrf().disable();
 		http.authorizeRequests()
 		.antMatchers("/h2/**").permitAll()
 		.antMatchers(HttpMethod.GET, "/api/users").hasAnyAuthority("USER","ADMIN")
-		.antMatchers(HttpMethod.POST, "/api/users").hasAuthority("ADMIN")
+		.antMatchers(HttpMethod.POST, "/api/users").hasAnyAuthority("ADMIN")
 		.anyRequest().authenticated()
 		.and()
 		.formLogin()
