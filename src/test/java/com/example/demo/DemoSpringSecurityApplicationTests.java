@@ -1,8 +1,10 @@
 package com.example.demo;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -72,7 +74,7 @@ class DemoSpringSecurityApplicationTests {
 	}
 
 	@Test
-	void PostWithANewUser() throws Exception {
+	void CreateANewUserWithAuthorizedUser() throws Exception {
 		MvcResult mvcResult = mockMvc.perform(formLogin().user("dave").password("pwd"))
 				.andExpect(authenticated().withUsername("dave")).andReturn();
 
@@ -89,6 +91,40 @@ class DemoSpringSecurityApplicationTests {
 	    mockMvc.perform(post("/api/users").contentType(MediaType.APPLICATION_JSON)
 	            .content(requestJson).session(session))
 	            .andExpect(status().isOk());
+
+	}
+	
+	@Test
+	void CreateANewUserWithUnAuthorizedUser() throws Exception {
+		MvcResult mvcResult = mockMvc.perform(formLogin().user("john").password("pwd"))
+				.andExpect(authenticated().withUsername("john")).andReturn();
+
+		MockHttpSession session = (MockHttpSession) mvcResult.getRequest().getSession(false);
+
+		User user = new User(null, "ian", "ian kramer", passwordEncoder.encode("pwd"),
+				Arrays.asList(new Role(null, "USER")));
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+		String requestJson = ow.writeValueAsString(user);
+		
+	    mockMvc.perform(post("/api/users").contentType(MediaType.APPLICATION_JSON)
+	            .content(requestJson).session(session))
+	            .andExpect(status().isForbidden());
+
+	}
+	
+	@Test
+	void GetUserByUserName() throws Exception {
+		MvcResult mvcResult = mockMvc.perform(formLogin().user("john").password("pwd"))
+				.andExpect(authenticated().withUsername("john")).andReturn();
+
+		MockHttpSession session = (MockHttpSession) mvcResult.getRequest().getSession(false);
+
+			
+		mockMvc.perform(get("/api/users?username=john").session(session)).andExpect(authenticated())
+		.andExpect(status().isOk());
 
 	}
 
