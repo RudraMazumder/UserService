@@ -19,4 +19,10 @@ public class Role {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 	private String name;
+	
+	@Override
+	public String toString() {
+		return name;
+	}
+	
 }
