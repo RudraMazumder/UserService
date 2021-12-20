@@ -127,6 +127,18 @@ class DemoSpringSecurityApplicationTests {
 		.andExpect(status().isOk());
 
 	}
+	
+	@Test
+	void addUserToRole() throws Exception {
+		MvcResult mvcResult = mockMvc.perform(formLogin().user("john").password("pwd"))
+				.andExpect(authenticated().withUsername("john")).andReturn();
+		MockHttpSession session = (MockHttpSession) mvcResult.getRequest().getSession(false);
+		mockMvc.perform(post("/api/users/john/roles/MANAGER").session(session)).andExpect(authenticated())
+		.andExpect(status().isOk());
+		
+		
+		
+	}
 
 	@BeforeEach
 	public void populateUsers() {
@@ -168,9 +180,5 @@ class DemoSpringSecurityApplicationTests {
 
 	}
 
-	/*
-	 * @Bean(name = "passwordEncoder") public PasswordEncoder encoder() { return new
-	 * BCryptPasswordEncoder(); }
-	 */
 
 }
