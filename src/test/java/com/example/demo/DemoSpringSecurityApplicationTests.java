@@ -18,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -136,6 +137,8 @@ class DemoSpringSecurityApplicationTests {
 		mockMvc.perform(post("/api/users/john/roles/MANAGER").session(session)).andExpect(authenticated())
 		.andExpect(status().isOk());
 		
+		mockMvc.perform(formLogin().user("john").password("pwd"))
+		.andExpect(authenticated().withUsername("john").withAuthorities(Arrays.asList(new SimpleGrantedAuthority("USER"), new SimpleGrantedAuthority("MANAGER"))));
 		
 		
 	}
