@@ -63,30 +63,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 	}
 
-	@PostConstruct
-	public void setup() {
-		// user creation with Role USER
 
-		User user = new User(null, "john", "John Doe", passwordEncoder.encode("pwd"),
-				Arrays.asList(new Role(null, "USER")));
-		log.info("user {} to be added with role {}", user.getUsername(), user.getRoles());
-		userRepo.save(user);
-		log.info("user {} added with role {}", user.getUsername(), user.getRoles());
-
-		// user creation with Role ADMIN
-		User admin = new User(null, "dave", "David Root", passwordEncoder.encode("pwd"),
-				Arrays.asList(new Role(null, "ADMIN")));
-		log.info("user {} to be added with role {}", admin.getUsername(), admin.getRoles());
-		userRepo.save(admin);
-		log.info("user {} added with role {}", admin.getUsername(), admin.getRoles());
-
-		// user creation with Role MANAGER
-		User manager = new User(null, "paul", "Paul Davies", passwordEncoder.encode("pwd"),
-				Arrays.asList(new Role(null, "MANAGER")));
-		log.info("user {} to be added with role {}", manager.getUsername(), manager.getRoles());
-		userRepo.save(manager);
-		log.info("user {} added with role {}", manager.getUsername(), manager.getRoles());
-	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
